@@ -25,14 +25,17 @@ import com.example.makeitso.common.snackbar.SnackbarManager
 import com.example.makeitso.model.service.AccountService
 import com.example.makeitso.model.service.LogService
 import com.example.makeitso.screens.MakeItSoViewModel
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
   private val accountService: AccountService,
   logService: LogService
 ) : MakeItSoViewModel(logService) {
+  private val auth: FirebaseAuth = FirebaseAuth.getInstance() // Inicializa FirebaseAuth
   var uiState = mutableStateOf(LoginUiState())
     private set
 
@@ -62,6 +65,10 @@ class LoginViewModel @Inject constructor(
 
     launchCatching {
       accountService.authenticate(email, password)
+      if (!auth.currentUser?.isEmailVerified!!) { // Verificar si el correo ha sido verificado
+        SnackbarManager.showMessage(AppText.email_not_verified_error)
+        return@launchCatching
+      }
       openAndPopUp(SETTINGS_SCREEN, LOGIN_SCREEN)
     }
   }

@@ -53,6 +53,11 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     auth.sendPasswordResetEmail(email).await()
   }
 
+  // para enviar un correo de verificación
+  override suspend fun sendEmailVerification() {
+    auth.currentUser?.sendEmailVerification()?.await()
+  }
+
   override suspend fun createAnonymousAccount() {
     auth.signInAnonymously().await()
   }
